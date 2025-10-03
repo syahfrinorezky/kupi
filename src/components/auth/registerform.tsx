@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import z, { number } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { registerSchema, RegisterFormData } from "@/schemas/registerSchema";
@@ -60,7 +59,7 @@ function RegisterForm() {
 
         if (timeout <= 0) {
           clearInterval(interval);
-          router.push("/");
+          router.push("/verify-otp?email=" + data.email);
         }
       }, 1000);
     } catch (error) {
@@ -80,7 +79,6 @@ function RegisterForm() {
       <h1 className="font-semibold text-primary text-center text-xl md:text-2xl mb-2">
         DAFTAR
       </h1>
-
       {successMessage && (
         <Alert type="success" message={successMessage}>
           {countDown !== null && (
@@ -95,7 +93,6 @@ function RegisterForm() {
       <AnimatePresence>
         {errorMessage && <Alert type="error" message={errorMessage} />}
       </AnimatePresence>
-
       <AnimatePresence>
         {!successMessage && !errorMessage && (
           <motion.p
@@ -114,7 +111,6 @@ function RegisterForm() {
           </motion.p>
         )}
       </AnimatePresence>
-
       {/* form */}
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -275,7 +271,7 @@ function RegisterForm() {
         <button
           type="submit"
           disabled={!isValid || loading}
-          className="mt-5 py-2 bg-primary rounded-md text-white font-semibold hover:bg-shadow-primary transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-5 py-2 bg-primary rounded-md flex text-center items-center justify-center text-white font-semibold hover:bg-shadow-primary transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? <FaSpinner className="w-5 h-5 animate-spin" /> : "Daftar"}
         </button>
