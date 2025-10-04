@@ -36,7 +36,7 @@ model User {
   password            String
   role                Role                 @default(USER)
   emailVerified       DateTime?
-  status              Status               @default(ACTIVE)
+  status              Status               @default(INACTIVE)
   accounts            Account[]
   categories          Category[]
   transactions        Transaction[]
@@ -104,6 +104,7 @@ model VerificationToken {
   userId    Int
   token     String   @unique
   expiresAt DateTime
+  used      Boolean  @default(false)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
