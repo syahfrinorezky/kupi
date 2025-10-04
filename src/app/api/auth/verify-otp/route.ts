@@ -8,26 +8,39 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { email, otp } = body;
+    const { sessionToken, otp } = body;
 
-    const tokenRecord = await prisma.verificationToken.findFirst({
-      where: {
-        user: { email },
-        expiresAt: { gte: new Date() },
-      },
+    if (!sessionToken || !otp) {
+      return NextResponse.json(
+        { message: "Session token dan OTP harus diisi" },
+        { status: 400 }
+      );
+    }
+
+    if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+      return NextResponse.json(
+        { message: "Format OTP tidak valid" },
+        { status: 400 }
+      );
+    }
+
+    const tokenRecord = await prisma.verificationToken.findUnique({
+      where: { sessionToken },
+      include: { user: true },
     });
 
-    if (!tokenRecord) {
+    if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
       return NextResponse.json(
-        { message: "Kode OTP sudah kadaluarsa nih" },
+        { message: "Sesi anda sudah kadaluarsa nih" },
         { status: 400 }
       );
     }
 
     const tokenUsed = tokenRecord.used;
+
     if (tokenUsed) {
       return NextResponse.json(
-        { message: "Kode OTP sudah pernah digunakan nih" },
+        { message: "Kode OTP sudah tidak berlaku nih" },
         { status: 400 }
       );
     }
