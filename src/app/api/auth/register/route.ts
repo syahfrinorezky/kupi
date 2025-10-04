@@ -48,6 +48,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       message: "Kode OTP telah dikirim ke email kamu",
+      status: 200,
     });
   } catch (error) {
     console.error(error);
