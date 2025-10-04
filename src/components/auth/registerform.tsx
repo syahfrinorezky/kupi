@@ -63,8 +63,9 @@ function RegisterForm() {
         }
       }, 1000);
     } catch (error) {
-      console.error(error);
-      setErrorMessage("Server error, coba lagi nanti");
+      setErrorMessage(
+        error instanceof Error ? error.message : "Terjadi kesalahan"
+      );
 
       setTimeout(() => {
         setErrorMessage("");
