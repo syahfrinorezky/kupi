@@ -40,20 +40,23 @@ export async function POST(req: Request) {
 
     const hashedOtp = await bcrypt.hash(otp, 10);
 
+    const sessionToken = crypto.randomUUID();
+
     await prisma.verificationToken.create({
       data: {
         userId: user.id,
         token: hashedOtp,
+        sessionToken,
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
       },
     });
 
     await sendOtpEmail(email, otp);
 
-    return NextResponse.json({
-      message: "Kode OTP telah dikirim ke email kamu",
-      status: 200,
-    });
+    return NextResponse.json(
+      { message: "Kode OTP telah dikirim ke email kamu", sessionToken },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: "Terjadi kesalahan" }, { status: 500 });
