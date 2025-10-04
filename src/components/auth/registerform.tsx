@@ -59,7 +59,7 @@ function RegisterForm() {
 
         if (timeout <= 0) {
           clearInterval(interval);
-          router.push("/verify-otp?email=" + data.email);
+          router.push("/verify-otp?email=" + encodeURIComponent(data.email));
         }
       }, 1000);
     } catch (error) {
