@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import clsx from "clsx";
-import { verifyOtp } from "@/service/auth";
+import { resendOtp, verifyOtp } from "@/service/auth";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaSpinner } from "react-icons/fa";
 import { HiClock } from "react-icons/hi2";
@@ -15,6 +15,13 @@ function VerifyOtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  useEffect(() => {
+    const sessionToken = searchParams.get("session");
+    if (!sessionToken) {
+      router.push("/register");
+    }
+  }, [router, searchParams]);
+
   const [otp, setOtp] = useState(Array(6).fill(""));
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -23,6 +30,7 @@ function VerifyOtpForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [countDown, setCountdown] = useState<number | null>(null);
+  const [resendCooldown, setResendCooldown] = useState<number>(0);
 
   const isValid = otp.every((d) => d.length === 1);
 
@@ -62,10 +70,8 @@ function VerifyOtpForm() {
     setCountdown(null);
 
     try {
-      const data = await verifyOtp(
-        searchParams.get("email") || "",
-        otp.join("")
-      );
+      const sessionToken = searchParams.get("session");
+      const data = await verifyOtp(sessionToken || "", otp.join(""));
 
       setSuccessMessage(data.message || "Berhasil verifikasi email nih!");
       setErrorMessage("");
@@ -97,7 +103,45 @@ function VerifyOtpForm() {
     }
   };
 
-  const resetOtp = () => {};
+  const resetOtp = async () => {
+    setResetLoading(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const sessionToken = searchParams.get("session");
+      const data = await resendOtp(sessionToken || "");
+      setSuccessMessage(data.message);
+      setErrorMessage("");
+
+      if (data.sessionToken) {
+        router.replace(`/verify-otp?session=${data.sessionToken}`);
+      }
+
+      let cooldown = 30;
+      setResendCooldown(cooldown);
+
+      const interval = setInterval(() => {
+        cooldown -= 1;
+        setResendCooldown(cooldown);
+
+        if (cooldown <= 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Terjadi kesalahan"
+      );
+      setSuccessMessage("");
+
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 3000);
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white border border-gray-400 shadow-md rounded-md p-4 max-w-4/5 md:max-w-1/2 lg:max-w-2/7 w-full">
@@ -214,9 +258,16 @@ function VerifyOtpForm() {
           Kamu tidak menerima email?{" "}
           <button
             onClick={resetOtp}
-            className="text-shadow-primary hover:text-primary hover:underline"
+            disabled={resetLoading || resendCooldown > 0}
+            className="text-shadow-primary hover:text-primary hover:underline font-semibold transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Kirim ulang
+            {resetLoading ? (
+              <FaSpinner className="animate-spin inline-block" />
+            ) : resendCooldown > 0 ? (
+              `(${resendCooldown})`
+            ) : (
+              "Kirim ulang"
+            )}
           </button>
         </p>
       </div>
