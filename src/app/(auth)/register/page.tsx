@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import RegisterForm from "@/components/auth/registerform";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col space-y-5 items-center justify-center w-full">
       <Link href={"/"} className="flex space-x-2">
