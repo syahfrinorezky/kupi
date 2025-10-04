@@ -47,7 +47,7 @@ function RegisterForm() {
       setSuccessMessage("");
       setCountdown(null);
 
-      await registerUser(data);
+      const res = await registerUser(data);
       setSuccessMessage("Daftar akun berhasil");
 
       let timeout = 3;
@@ -59,7 +59,7 @@ function RegisterForm() {
 
         if (timeout <= 0) {
           clearInterval(interval);
-          router.push("/verify-otp?email=" + encodeURIComponent(data.email));
+          router.push(`/verify-otp?session=${res.sessionToken}`);
         }
       }, 1000);
     } catch (error) {
