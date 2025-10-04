@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { sendOtpEmail } from "@/lib/mailer";
 
 export async function POST(req: Request) {
+  if (req.method !== "POST") return;
+
   try {
     const body = await req.json();
 
@@ -12,14 +14,15 @@ export async function POST(req: Request) {
     const existingUser = await prisma.user.findUnique({
       where: {
         email,
+        status: "ACTIVE",
       },
     });
 
     if (existingUser) {
-      return NextResponse.json({
-        message: "Email telah terdaftar",
-        status: 409,
-      });
+      return NextResponse.json(
+        { message: "Email telah terdaftar" },
+        { status: 409 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -29,6 +32,7 @@ export async function POST(req: Request) {
         name,
         email,
         password: hashedPassword,
+        status: "INACTIVE",
       },
     });
 
@@ -40,7 +44,7 @@ export async function POST(req: Request) {
       data: {
         userId: user.id,
         token: hashedOtp,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
       },
     });
 
