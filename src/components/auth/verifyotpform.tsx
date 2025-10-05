@@ -85,7 +85,7 @@ function VerifyOtpForm() {
 
         if (timeout <= 0) {
           clearInterval(interval);
-          router.push("/login");
+          router.push("/");
         }
       }, 1000);
     } catch (error) {
