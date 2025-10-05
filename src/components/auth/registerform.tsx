@@ -80,16 +80,19 @@ function RegisterForm() {
       <h1 className="font-semibold text-primary text-center text-xl md:text-2xl mb-2">
         DAFTAR
       </h1>
-      {successMessage && (
-        <Alert type="success" message={successMessage}>
-          {countDown !== null && (
-            <span className="flex items-center space-x-1">
-              <HiClock className="w-4 h-4" />
-              <span>{countDown}</span>
-            </span>
-          )}
-        </Alert>
-      )}
+
+      <AnimatePresence>
+        {successMessage && (
+          <Alert type="success" message={successMessage}>
+            {countDown !== null && (
+              <span className="flex items-center space-x-1">
+                <HiClock className="w-4 h-4" />
+                <span>{countDown}</span>
+              </span>
+            )}
+          </Alert>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {errorMessage && <Alert type="error" message={errorMessage} />}
@@ -104,7 +107,7 @@ function RegisterForm() {
           >
             Sudah punya akun?{" "}
             <Link
-              href="/login"
+              href="/"
               className="text-shadow-primary hover:text-primary hover:underline transition duration-300 ease-in-out"
             >
               Masuk
