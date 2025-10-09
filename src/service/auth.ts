@@ -1,5 +1,6 @@
 import { RegisterFormData } from "@/schemas/registerSchema";
 import { loginFormData } from "@/schemas/loginSchema";
+import { ForgotPwFormData } from "@/schemas/forgopwSchema";
 import { setTokenToStorage } from "@/lib/jwt.client";
 
 export async function registerUser(data: RegisterFormData) {
@@ -71,4 +72,21 @@ export async function loginUser(data: loginFormData) {
   setTokenToStorage(resultData.token);
 
   return resultData;
+}
+
+export async function forgotPassword(data: ForgotPwFormData) {
+  const res = await fetch("/api/auth/forgot-password", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.message || "Terjadi kesalahan");
+  }
+
+  return res.json();
 }
