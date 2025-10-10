@@ -52,8 +52,16 @@ function ForgotPwForm() {
       </h1>
 
       <Image
-        src="/images/mascot/penny-forgot-pw.png"
-        alt="Mascot Penny Forgot Password"
+        src={
+          successMessage
+        ? "/images/mascot/penny-forgot-pw-sent.png"
+        : "/images/mascot/penny-forgot-pw.png"
+        }
+        alt={
+          successMessage
+        ? "Mascot Penny Forgot Password Success"
+        : "Mascot Penny Forgot Password"
+        }
         width={1080}
         height={1080}
         className="w-32 h-32 mx-auto mb-2"
